@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Админ-панель — AutoDetail Pro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="fa.local.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">
+      <i class="fas fa-car"></i>
+      <span>AutoDetail Pro</span>
+    </div>
+    <h2>Вход в панель</h2>
+    <p class="login-sub">Введите данные для доступа к управлению</p>
+    <form id="loginForm">
+      <div class="field">
+        <label>Логин</label>
+        <div class="input-wrap">
+          <i class="fas fa-user"></i>
+          <input type="text" id="username" value="admin" placeholder="admin">
+        </div>
+      </div>
+      <div class="field">
+        <label>Пароль</label>
+        <div class="input-wrap">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="password" placeholder="Введите пароль" required>
+        </div>
+      </div>
+      <div class="login-error" id="loginError" style="display:none">
+        <i class="fas fa-exclamation-circle"></i> Неверный логин или пароль
+      </div>
+      <button type="submit" class="btn-login" id="loginBtn">
+        <i class="fas fa-sign-in-alt"></i> Войти
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-layout" id="adminPanel" style="display:none">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <i class="fas fa-car"></i>
+      <span>AutoDetail Pro</span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-tab="orders">
+        <i class="fas fa-clipboard-list"></i>
+        <span>Заявки</span>
+        <span class="nav-badge" id="navBadge" style="display:none">0</span>
+      </button>
+      <button class="nav-item" data-tab="customers">
+        <i class="fas fa-users"></i>
+        <span>Клиенты</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="/" target="_blank" class="sidebar-link">
+        <i class="fas fa-external-link-alt"></i> <span>Открыть сайт</span>
+      </a>
+      <button class="sidebar-link logout-btn" id="logoutBtn">
+        <i class="fas fa-sign-out-alt"></i> <span>Выйти</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="admin-main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <button class="burger-admin" id="burgerAdmin"><i class="fas fa-bars"></i></button>
+      <h1 class="page-title" id="pageTitle">Заявки</h1>
+      <div class="topbar-right">
+        <button class="icon-btn" id="refreshBtn" title="Обновить"><i class="fas fa-sync-alt"></i></button>
+        <a href="tel:+79276424741" class="icon-btn topbar-phone" title="Позвонить клиенту">
+          <i class="fas fa-phone"></i>
+        </a>
+        <div class="admin-user">
+          <i class="fas fa-user-shield"></i>
+          <span id="adminUsername">admin</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fff4e6;color:#ff5722"><i class="fas fa-clipboard-list"></i></div>
+        <div class="stat-info">
+          <div class="stat-val" id="statTotal">—</div>
+          <div class="stat-label">Всего заявок</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#fff0f0;color:#e74c3c"><i class="fas fa-bell"></i></div>
+        <div class="stat-info">
+          <div class="stat-val" id="statNew">—</div>
+          <div class="stat-label">Новых</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#e8f6f3;color:#27ae60"><i class="fas fa-users"></i></div>
+        <div class="stat-info">
+          <div class="stat-val" id="statCustomers">—</div>
+          <div class="stat-label">Клиентов</div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:#eaf4ff;color:#3498db"><i class="fas fa-cog"></i></div>
+        <div class="stat-info">
+          <div class="stat-val" id="statProcessing">—</div>
+          <div class="stat-label">В работе</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ORDERS TAB -->
+    <div class="tab-content" id="tabOrders">
+      <div class="table-header">
+        <div class="table-filters">
+          <button class="filter-btn active" data-status="all">Все</button>
+          <button class="filter-btn" data-status="new">Новые</button>
+          <button class="filter-btn" data-status="processing">В работе</button>
+          <button class="filter-btn" data-status="completed">Выполнены</button>
+          <button class="filter-btn" data-status="cancelled">Отменены</button>
+        </div>
+        <a href="/api/export/orders" class="export-btn" title="Скачать CSV">
+          <i class="fas fa-download"></i> Экспорт CSV
+        </a>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Клиент</th>
+              <th>Телефон</th>
+              <th>Email</th>
+              <th>Услуга</th>
+              <th>Статус</th>
+              <th>Дата</th>
+              <th>Действия</th>
+            </tr>
+          </thead>
+          <tbody id="ordersBody">
+            <tr><td colspan="8" class="loading-row"><i class="fas fa-spinner fa-spin"></i> Загрузка...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="ordersEmpty" style="display:none">
+        <i class="fas fa-inbox"></i>
+        <p>Нет заявок</p>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS TAB -->
+    <div class="tab-content" id="tabCustomers" style="display:none">
+      <div class="table-header">
+        <div></div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Имя</th>
+              <th>Телефон</th>
+              <th>Email</th>
+              <th>Заявок</th>
+              <th>Первая заявка</th>
+              <th>Последняя заявка</th>
+              <th>Связь</th>
+            </tr>
+          </thead>
+          <tbody id="customersBody">
+            <tr><td colspan="8" class="loading-row"><i class="fas fa-spinner fa-spin"></i> Загрузка...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="empty-state" id="customersEmpty" style="display:none">
+        <i class="fas fa-user-slash"></i>
+        <p>Нет клиентов</p>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ORDER DETAIL MODAL -->
+<div class="modal-overlay" id="orderModal" style="display:none">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Заявка <span id="modalOrderId"></span></h3>
+      <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-info-grid">
+        <div class="modal-field">
+          <label>Клиент</label>
+          <p id="modalName">—</p>
+        </div>
+        <div class="modal-field">
+          <label>Телефон</label>
+          <a id="modalPhone" href="#" class="modal-link modal-link-phone">—</a>
+        </div>
+        <div class="modal-field">
+          <label>Email</label>
+          <a id="modalEmail" href="#" class="modal-link modal-link-email">—</a>
+        </div>
+        <div class="modal-field">
+          <label>Услуга</label>
+          <p id="modalService">—</p>
+        </div>
+        <div class="modal-field">
+          <label>Дата заявки</label>
+          <p id="modalDate">—</p>
+        </div>
+        <div class="modal-field">
+          <label>Статус</label>
+          <select class="status-select-modal" id="modalStatus">
+            <option value="new">🔴 Новая</option>
+            <option value="processing">🟡 В работе</option>
+            <option value="completed">🟢 Выполнена</option>
+            <option value="cancelled">⚫ Отменена</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-field modal-field-full">
+        <label>Сообщение от клиента</label>
+        <p id="modalMessage" class="modal-message">—</p>
+      </div>
+      <div class="modal-contact-actions">
+        <a id="modalCallBtn" href="#" class="modal-action-btn modal-action-phone">
+          <i class="fas fa-phone"></i> Позвонить
+        </a>
+        <a id="modalEmailBtn" href="#" class="modal-action-btn modal-action-email">
+          <i class="fas fa-envelope"></i> Написать
+        </a>
+        <a id="modalWaBtn" href="#" class="modal-action-btn modal-action-wa" target="_blank">
+          <i class="fab fa-whatsapp"></i> WhatsApp
+        </a>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" id="modalCancelBtn">Закрыть</button>
+      <button class="btn-save" id="modalSaveBtn"><i class="fas fa-save"></i> Сохранить статус</button>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay for mobile sidebar -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<script src="admin.js"></script>
+</body>
+</html>
